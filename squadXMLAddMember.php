@@ -3,6 +3,8 @@
 
 	//in-game name
 	$ingameName = strip_tags((string)$_POST['ingame_name']);
+	str_replace("\r", "", (string)$ingameName);
+	str_replace("\n", "", (string)$ingameName);
 	$ingameName = htmlentities($ingameName, ENT_XML1);
 
 	//player ID
@@ -14,6 +16,8 @@
 
 	//'real' name
 	$name = strip_tags((string)$_POST['name']);
+	str_replace("\r", "", (string)$name);
+	str_replace("\n", "", (string)$name);
 	$name = htmlentities($name, ENT_XML1);
 
 	//email
@@ -31,7 +35,7 @@
 	//chosen squad xml file
 	$squadXMLFile = strip_tags((string)$_POST['logo']);
 	str_replace("\\", "/", $squadXMLFile); //in case someone tries some trickery fuckery magic
-	if (!file_exists($_SERVER['DOCUMENT_ROOT'] ."/$squadXMLFile.xml") || count(explode("/", $squadXMLFile)) !== 2) {
+	if (count(explode("/", $squadXMLFile)) !== 2 || !file_exists($_SERVER['DOCUMENT_ROOT'] ."/$squadXMLFile.xml")) {
 		echo "squad XML for selected logo no longer exists, please select another";
 		exit();
 	}
@@ -41,10 +45,10 @@
 
 	//add it to the squad.xml
 	$squadXML = new DOMDocument();
-	$squadXML->load("squad.xml");
+	$squadXML->load($_SERVER['DOCUMENT_ROOT'] ."/$squadXMLFile.xml");
 	$squadXML->getElementsByTagName("squad")->item(0)->appendChild($newMember);
 	if ($squadXML->validate()) {
-		$squadXML->save("squad.xml");
+		$squadXML->save($_SERVER['DOCUMENT_ROOT'] ."/$squadXMLFile.xml");
 	} else {
 		echo htmlentities("an error occurred appending the new <member> block");
 		exit();
